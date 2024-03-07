@@ -1,0 +1,112 @@
+<%-- Fetch "From" and "To" values from the database --%>
+<%
+String fromValue = ""; // Initialize with a default value
+String toValue = "";   // Initialize with a default value
+
+try {
+    Class.forName("com.mysql.cj.jdbc.Driver");
+    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/carpooling", "root", "mca123");
+    Statement stmt = conn.createStatement();
+
+    // Fetch "From" and "To" values from the database (You may need to write specific SQL queries)
+    ResultSet locationResultSet = stmt.executeQuery("SELECT from_location, to_location FROM locations");
+
+    if (locationResultSet.next()) {
+        fromValue = locationResultSet.getString("from_location");
+        toValue = locationResultSet.getString("to_location");
+    }
+
+    locationResultSet.close();
+    stmt.close();
+    conn.close();
+} catch (Exception e) {
+    e.printStackTrace();
+}
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Rest of your head section -->
+</head>
+<body>
+    <!-- Your existing HTML code -->
+
+    <div class="container">
+        <!-- Form to select "From" and "To" values -->
+        <form action="RideServlet" method="post" class="row g-3 mt-5" style="display: flex; justify-content: center;">
+            <div class="col-md-2">
+                <label for="from" class="form-label">From</label>
+                <select class="form-select" id="from" name="from">
+                    <option selected value="<%= fromValue %>"><%= fromValue %></option>
+                    <!-- Add other options here -->
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="to" class="form-label">To</label>
+                <select class="form-select" id="to" name="to">
+                    <option selected value="<%= toValue %>"><%= toValue %></option>
+                    <!-- Add other options here -->
+                </select>
+            </div>
+            <!-- Rest of your form fields -->
+            <div class="col-md-2">
+                <label for="submit" class="form-label">&nbsp;</label>
+                <button type="button" class="form-control btn btn-primary" onclick="redirectToRidesPage()">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Display filtered ride information here -->
+    <div class="table-responsive" style="padding: 5% 5% 0% 5%;">
+        <h1>Get Yourself a Ride !</h1><br>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <!-- Your table headers -->
+            </thead>
+            <tbody>
+                <%
+                    // Fetch and display ride information based on "From" and "To" values
+                    try {
+                        Class.forName("com.mysql.cj.jdbc.Driver");
+                        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/carpooling", "root", "mca123");
+                        Statement stmt = conn.createStatement();
+
+                        // Fetch and filter ride information based on the "From" and "To" values
+                        ResultSet rs = stmt.executeQuery("SELECT name, profile_photo, date, pickuptime, drop_location, droptime, charges, available_seats, charges FROM rides WHERE from_location = '" + fromValue + "' AND to_location = '" + toValue + "'");
+
+                        while (rs.next()) {
+                %>
+                <tr>
+                    <!-- Display ride information as needed -->
+                </tr>
+                <%
+                        }
+                        rs.close();
+                        stmt.close();
+                        conn.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                %>
+            </tbody>
+        </table>
+    </div>
+</body>
+<script>
+    document.getElementById('date').min = new Date().toISOString().split('T')[0];
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script>
+    function redirectToRidesPage() {
+        // Use JavaScript to redirect to "rides.jsp"
+        window.location.href = "login1.jsp";
+    }
+</script>
+<script>
+    function redirectToRidesPage() {
+        // Use JavaScript to redirect to "rides.jsp"
+        window.location.href = "rides.jsp";
+    }
+</script>
+</html>
